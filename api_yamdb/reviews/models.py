@@ -14,13 +14,14 @@ class User(AbstractUser):
 
     username = models.CharField(
         'Имя пользователя',
-        max_length=20,
+        max_length=150,
         null=True,
         unique=True
     )
     email = models.EmailField(
         'E-mail',
-        unique=True
+        unique=True,
+        max_length=254,
     )
     role = models.CharField(
         'Роль',
@@ -49,7 +50,7 @@ class User(AbstractUser):
 class Category(models.Model):
     name = models.CharField(
         'Название',
-        max_length=50
+        max_length=256
     )
     slug = models.SlugField(
         'Адрес',
@@ -69,7 +70,7 @@ class Category(models.Model):
 class Genre(models.Model):
     name = models.CharField(
         'Название',
-        max_length=50
+        max_length=256
     )
     slug = models.SlugField(
         'Адрес',
@@ -89,7 +90,7 @@ class Genre(models.Model):
 class Title(models.Model):
     name = models.CharField(
         'Название',
-        max_length=100
+        max_length=256
     )
     year = models.IntegerField(
         'Год выпуска',
