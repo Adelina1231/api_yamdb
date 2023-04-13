@@ -61,7 +61,7 @@ class Category(models.Model):
 
     def __str__(self):
         return self.name
-    
+
     class Meta:
         verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
@@ -81,7 +81,7 @@ class Genre(models.Model):
 
     def __str__(self):
         return self.name
-    
+
     class Meta:
         verbose_name = 'Жанр'
         verbose_name_plural = 'Жанры'
@@ -116,7 +116,7 @@ class Title(models.Model):
 
     def __str__(self):
         return self.name
-    
+
     @property
     def rating(self):
         """
@@ -128,7 +128,7 @@ class Title(models.Model):
             return reviews.aggregate(Avg('score'))['score__avg']
         else:
             return None
-    
+
     class Meta:
         verbose_name = 'Произведение'
         verbose_name_plural = 'Произведения'
@@ -152,6 +152,7 @@ class GenreTitle(models.Model):
         verbose_name = 'Произведение и жанр'
         verbose_name_plural = 'Произведения и жанры'
 
+
 class Review(models.Model):
     text = models.TextField(
         'Текст отзыва',
@@ -167,7 +168,7 @@ class Review(models.Model):
     )
     author = author = models.ForeignKey(
         User,
-        on_delete=models.SET_NULL, null=True,
+        on_delete=models.CASCADE, null=True,
         related_name='reviews',
         verbose_name='Автор отзыва',
     )
@@ -177,13 +178,15 @@ class Review(models.Model):
         related_name='reviews',
         verbose_name='Произведение',
     )
-    
+
     def __str__(self):
         return self.title.name
-    
+
     class Meta:
         verbose_name = 'Отзыв'
         verbose_name_plural = 'Отзывы'
+        ordering = ('pub_date',)
+
 
 class Comment(models.Model):
     text = models.TextField(
@@ -196,7 +199,7 @@ class Comment(models.Model):
     )
     author = models.ForeignKey(
         User,
-        on_delete=models.SET_NULL, null=True,
+        on_delete=models.CASCADE, null=True,
         related_name='comments',
         verbose_name='Автор комментария',
     )
@@ -206,7 +209,8 @@ class Comment(models.Model):
         related_name='comments',
         verbose_name='Отзыв',
     )
-    
+
     class Meta:
         verbose_name = 'Комментарий'
         verbose_name_plural = 'Комментарии'
+        ordering = ('pub_date',)
