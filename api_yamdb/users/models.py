@@ -12,17 +12,6 @@ class User(AbstractUser):
         (ADMIN, 'admin')
     )
 
-    username = models.CharField(
-        'Имя пользователя',
-        max_length=150,
-        null=True,
-        unique=True
-    )
-    email = models.EmailField(
-        'E-mail',
-        unique=True,
-        max_length=254,
-    )
     role = models.CharField(
         'Роль',
         max_length=50,

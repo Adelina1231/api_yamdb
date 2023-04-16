@@ -108,6 +108,11 @@ STATICFILES_DIRS = ((BASE_DIR / "static/"),)
 
 AUTH_USER_MODEL = "users.User"
 
+EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+EMAIL_FILE_PATH = Path.cwd() / 'sent_emails'
+
+EMAIL_AUTH_NAME = 'info@yamdb.ru'
+
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.'
                                 'PageNumberPagination',

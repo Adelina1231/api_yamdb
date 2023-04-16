@@ -32,7 +32,7 @@ class AdminOnly(permissions.BasePermission):
         return False
 
 
-class OnlyOwnAccount(permissions.BasePermission):
+class OnlyRegistered(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         return obj.user == request.user
 
