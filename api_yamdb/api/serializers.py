@@ -52,12 +52,3 @@ class TitleSerializer(ModelSerializer):
     class Meta:
         fields = '__all__'
         model = Title
-
-
-class GenreTitleSerializer(ModelSerializer):
-    category = CategorySerializer(read_only=True)
-    genre = GenreSerializer(many=True, read_only=True)
-
-    class Meta:
-        fields = '__all__'
-        model = GenreTitle
