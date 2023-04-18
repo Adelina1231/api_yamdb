@@ -8,6 +8,8 @@ from .views import (
     GenreViewSet,
     TitleViewSet,
     UsersViewSet,
+    ReviewViewSet,
+    CommentViewSet
 )
 
 v1_router = DefaultRouter()
@@ -15,6 +17,16 @@ v1_router.register(r"categories", CategoryViewSet)
 v1_router.register(r"genres", GenreViewSet)
 v1_router.register(r"titles", TitleViewSet)
 v1_router.register(r"users", UsersViewSet)
+v1_router.register(
+    r"titles/(?P<title_id>\d+)/reviews",
+    ReviewViewSet,
+    basename="review"
+)
+v1_router.register(
+    r"titles/(?P<title_id>\d+)/reviews/(?P<review_id>\d+)/comments",
+    CommentViewSet,
+    basename="comment"
+)
 
 auth_patterns = [
     path("signup/", signup),

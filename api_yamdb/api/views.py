@@ -17,14 +17,16 @@ from rest_framework.mixins import (
 )
 
 from users.models import User
-from reviews.models import Category, Genre, Title
+from reviews.models import Category, Comment, Genre, Review, Title
 from users.serializers import UserSerializer
 from .serializers import (
     CategorySerializer,
+    CommentSerializer,
     GenreSerializer,
-    TitleSerializer,
+    ReviewSerializer,
     SignupSerializer,
-    TokenSerializer,
+    TitleSerializer,
+    TokenSerializer
 )
 from .permissions import AdminOnly, OnlyRegistered
 
@@ -124,3 +126,17 @@ class UsersViewSet(ModelViewSet):
             else:
                 serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class ReviewViewSet(ModelViewSet):
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter,)
+    search_fields = ("score", "author")
+
+
+class CommentViewSet(ModelViewSet):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter,)
+    search_fields = ("review", "author")
