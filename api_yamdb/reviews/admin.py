@@ -11,6 +11,7 @@ class CategoryAdmin(admin.ModelAdmin):
     )
     search_fields = ('name',)
     list_filter = ('name',)
+    prepopulated_fields = {'slug': ('name',)}
     empty_value_display = '-пусто-'
 
 
@@ -22,6 +23,7 @@ class GenreAdmin(admin.ModelAdmin):
     )
     search_fields = ('name',)
     list_filter = ('name',)
+    prepopulated_fields = {'slug': ('name',)}
     empty_value_display = '-пусто-'
 
 

@@ -1,22 +1,25 @@
 from django.db import models
 from django.db.models import Avg
 
+from api_yamdb.validators import validate_year, validate_slug
+from api_yamdb.settings import LEN_TEXT
 from users.models import User
-
 
 class Category(models.Model):
     name = models.CharField(
         'Название',
-        max_length=256
+        max_length=256,
+        db_index=True
     )
     slug = models.SlugField(
         'Адрес',
         max_length=50,
+        validators=(validate_slug,),
         unique=True
     )
 
     def __str__(self):
-        return self.name
+        return self.name[:LEN_TEXT]
 
     class Meta:
         verbose_name = 'Категория'
@@ -27,16 +30,18 @@ class Category(models.Model):
 class Genre(models.Model):
     name = models.CharField(
         'Название',
-        max_length=256
+        max_length=256,
+        db_index=True
     )
     slug = models.SlugField(
         'Адрес',
         max_length=50,
+        validators=(validate_slug,),
         unique=True
     )
 
     def __str__(self):
-        return self.name
+        return self.name[:LEN_TEXT]
 
     class Meta:
         verbose_name = 'Жанр'
@@ -47,20 +52,24 @@ class Genre(models.Model):
 class Title(models.Model):
     name = models.CharField(
         'Название',
-        max_length=256
+        max_length=256,
+        db_index=True
     )
     year = models.IntegerField(
         'Год выпуска',
+        validators=[validate_year]
     )
     description = models.TextField(
         'Описание',
         null=True,
         blank=True
     )
-    genre = models.ManyToManyField(
+    genre = models.ForeignKey(
         Genre,
         verbose_name='Жанр',
-        through='GenreTitle'
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='titles'
     )
     category = models.ForeignKey(
         Category,
@@ -71,7 +80,7 @@ class Title(models.Model):
     )
 
     def __str__(self):
-        return self.name
+        return self.name[:LEN_TEXT]
 
     @property
     def rating(self):

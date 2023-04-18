@@ -23,8 +23,9 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "users.apps.UsersConfig",
     "api.apps.ApiConfig",
-    "reviews",
+    "reviews.apps.ReviewsConfig",
     "rest_framework",
+    "django_filters"
 ]
 
 MIDDLEWARE = [
@@ -113,7 +114,16 @@ EMAIL_FILE_PATH = Path.cwd() / 'sent_emails'
 
 EMAIL_AUTH_NAME = 'info@yamdb.ru'
 
+LEN_TEXT = 15
+
 REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.'
                                 'PageNumberPagination',
     "PAGE_SIZE": 10,
