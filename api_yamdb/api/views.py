@@ -37,11 +37,11 @@ from .filters import TitleFilter
 @permission_classes([AllowAny])
 def signup(request):
     serializer = SignupSerializer(data=request.data)
-    username = request.data["username"]
-    email = request.data["email"]
+    username = request.data.get("username", None)
+    email = request.data.get("email", None)
+    print(username, email)
     if not serializer.is_valid(raise_exception=True):
         return Response(status=status.HTTP_400_BAD_REQUEST)
-    print(username, email)
     if not User.objects.filter(
         username=username, email=email
     ):
@@ -53,7 +53,7 @@ def signup(request):
     send_mail(
         "Hello! Your confirmation code: ",
         confirmation_code,
-        settings.EMAIL_AUTH_NAME,
+        settings.EMAIL_AUTH_ADDR,
         [email],
         fail_silently=True,
     )
@@ -139,6 +139,7 @@ class UsersViewSet(ModelViewSet):
             else:
                 serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class ReviewViewSet(ModelViewSet):
