@@ -35,7 +35,7 @@ class CategorySerializer(ModelSerializer):
 
 class GenreSerializer(ModelSerializer):
     class Meta:
-        fields = '__all__'
+        fields = ('name', 'slug')
         model = Genre
 
 
@@ -53,6 +53,16 @@ class TitleSerializer(ModelSerializer):
     class Meta:
         fields = '__all__'
         model = Title
+
+
+class GenreTitleSerializer(ModelSerializer):
+    genre = GenreSerializer(many=True, read_only=True)
+    category = CategorySerializer(read_only=True)
+    rating = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = Title
+        fields = '__all__'
 
 
 class ReviewSerializer(ModelSerializer):

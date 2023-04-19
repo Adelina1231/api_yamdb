@@ -8,8 +8,7 @@ from users.models import User
 class Category(models.Model):
     name = models.CharField(
         'Название',
-        max_length=256,
-        db_index=True
+        max_length=256
     )
     slug = models.SlugField(
         'Адрес',
@@ -30,8 +29,7 @@ class Category(models.Model):
 class Genre(models.Model):
     name = models.CharField(
         'Название',
-        max_length=256,
-        db_index=True
+        max_length=256
     )
     slug = models.SlugField(
         'Адрес',
@@ -52,8 +50,7 @@ class Genre(models.Model):
 class Title(models.Model):
     name = models.CharField(
         'Название',
-        max_length=256,
-        db_index=True
+        max_length=256
     )
     year = models.IntegerField(
         'Год выпуска',
@@ -64,12 +61,11 @@ class Title(models.Model):
         null=True,
         blank=True
     )
-    genre = models.ForeignKey(
+    genre = models.ManyToManyField(
         Genre,
         verbose_name='Жанр',
-        on_delete=models.SET_NULL,
-        null=True,
-        related_name='titles'
+        related_name='titles',
+        through='GenreTitle'
     )
     category = models.ForeignKey(
         Category,
@@ -104,11 +100,17 @@ class GenreTitle(models.Model):
     title = models.ForeignKey(
         Title,
         verbose_name='Произведение',
-        on_delete=models.CASCADE)
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='titles')
     genre = models.ForeignKey(
         Genre,
         verbose_name='Жанр',
-        on_delete=models.CASCADE)
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='genres')
 
     def __str__(self):
         return f'{self.title}, жанр - {self.genre}'

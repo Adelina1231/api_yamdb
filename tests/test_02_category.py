@@ -11,14 +11,10 @@ class Test02CategoryAPI:
 
     def test_01_category_not_auth(self, client):
         response = client.get('/api/v1/categories/')
-        print(response.data)
-        print('Ошибка')
         assert response.status_code != HTTPStatus.NOT_FOUND, (
             'Эндпоинт `/api/v1/categories/` не найден. Проверьте настройки в '
             '*urls.py*.'
         )
-        print(response.data)
-        print('ошибка')
         assert response.status_code == HTTPStatus.OK, (
             'Проверьте, что GET-запрос неавторизованного пользователя к '
             '`/api/v1/categories/` возвращает ответ со статусом 200.'

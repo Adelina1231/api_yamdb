@@ -33,7 +33,7 @@ class TitleAdmin(admin.ModelAdmin):
         'name',
         'year',
         'description',
-        'category'
+        'category',
     )
     search_fields = ('name', 'year', 'category')
     list_filter = ('name',)
@@ -43,8 +43,8 @@ class TitleAdmin(admin.ModelAdmin):
 class GenreTitleAdmin(admin.ModelAdmin):
     list_display = (
         'pk',
-        'title',
-        'genre',
+        'title_id',
+        'genre_id',
     )
     search_fields = ('title',)
     empty_value_display = '-пусто-'
