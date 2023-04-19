@@ -5,6 +5,7 @@ from api_yamdb.validators import validate_year, validate_slug
 from api_yamdb.settings import LEN_TEXT
 from users.models import User
 
+
 class Category(models.Model):
     name = models.CharField(
         'Название',

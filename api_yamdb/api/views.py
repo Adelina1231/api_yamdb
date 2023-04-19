@@ -9,7 +9,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
-from rest_framework import filters
+from rest_framework import filters, permissions
 from rest_framework.mixins import (
     CreateModelMixin,
     ListModelMixin,
@@ -29,7 +29,12 @@ from .serializers import (
     GenreTitleSerializer,
     TokenSerializer
 )
-from .permissions import AdminOnly, OnlyRegistered, AdminOrReadOnly
+from .permissions import (
+    AdminOnly,
+    AdminOrReadOnly,
+    IsAuthorOrModerOrAdmin,
+    OnlyRegistered,
+)
 from .filters import TitleFilter
 
 
@@ -107,6 +112,10 @@ class TitleViewSet(ModelViewSet):
     permission_classes = (AdminOrReadOnly,)
     filterset_class = TitleFilter
 
+    # def get_queryset(self):
+    #     queryset = Title.objects.annotate(rating=Avg('reviews__score')).all()
+    #     return queryset
+
     def get_serializer_class(self):
         if self.request.method == 'GET':
             return GenreTitleSerializer
@@ -142,14 +151,43 @@ class UsersViewSet(ModelViewSet):
 
 
 class ReviewViewSet(ModelViewSet):
-    queryset = Review.objects.all()
     serializer_class = ReviewSerializer
+    permission_classes = (
+        permissions.IsAuthenticatedOrReadOnly,
+        IsAuthorOrModerOrAdmin
+    )
     filter_backends = (DjangoFilterBackend, filters.SearchFilter,)
     search_fields = ("score", "author")
 
+    def perform_create(self, serializer):
+        title_id = self.kwargs.get("title_id")
+        title = get_object_or_404(Title, id=title_id)
+        serializer.save(author=self.request.user, title=title)
+
+    def get_queryset(self):
+        title_id = self.kwargs.get("title_id")
+        title = get_object_or_404(Title, id=title_id)
+        return title.reviews.all()
+
 
 class CommentViewSet(ModelViewSet):
-    queryset = Comment.objects.all()
     serializer_class = CommentSerializer
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly,
+        IsAuthorOrModerOrAdmin]
     filter_backends = (DjangoFilterBackend, filters.SearchFilter,)
     search_fields = ("review", "author")
+
+    def perform_create(self, serializer):
+        title_id = self.kwargs.get('title_id')
+        title = get_object_or_404(Title, id=title_id)
+        review_id = self.kwargs.get("review_id")
+        review = get_object_or_404(Review, id=review_id, title=title)
+        serializer.save(author=self.request.user, review=review)
+
+    def get_queryset(self):
+        title_id = self.kwargs.get('title_id')
+        title = get_object_or_404(Title, id=title_id)
+        review_id = self.kwargs.get("review_id")
+        review = get_object_or_404(Review, id=review_id, title=title)
+        return Comment.objects.filter(review=review)
