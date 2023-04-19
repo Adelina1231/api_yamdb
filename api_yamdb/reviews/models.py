@@ -1,8 +1,9 @@
 from django.db import models
 from django.db.models import Avg
 
+from api_yamdb.validators import validate_year, validate_slug
+from api_yamdb.settings import LEN_TEXT
 from users.models import User
-
 
 class Category(models.Model):
     name = models.CharField(
@@ -12,11 +13,12 @@ class Category(models.Model):
     slug = models.SlugField(
         'Адрес',
         max_length=50,
+        validators=(validate_slug,),
         unique=True
     )
 
     def __str__(self):
-        return self.name
+        return self.name[:LEN_TEXT]
 
     class Meta:
         verbose_name = 'Категория'
@@ -32,11 +34,12 @@ class Genre(models.Model):
     slug = models.SlugField(
         'Адрес',
         max_length=50,
+        validators=(validate_slug,),
         unique=True
     )
 
     def __str__(self):
-        return self.name
+        return self.name[:LEN_TEXT]
 
     class Meta:
         verbose_name = 'Жанр'
@@ -51,6 +54,7 @@ class Title(models.Model):
     )
     year = models.IntegerField(
         'Год выпуска',
+        validators=[validate_year]
     )
     description = models.TextField(
         'Описание',
@@ -60,6 +64,7 @@ class Title(models.Model):
     genre = models.ManyToManyField(
         Genre,
         verbose_name='Жанр',
+        related_name='titles',
         through='GenreTitle'
     )
     category = models.ForeignKey(
@@ -71,7 +76,7 @@ class Title(models.Model):
     )
 
     def __str__(self):
-        return self.name
+        return self.name[:LEN_TEXT]
 
     @property
     def rating(self):
@@ -95,11 +100,17 @@ class GenreTitle(models.Model):
     title = models.ForeignKey(
         Title,
         verbose_name='Произведение',
-        on_delete=models.CASCADE)
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='titles')
     genre = models.ForeignKey(
         Genre,
         verbose_name='Жанр',
-        on_delete=models.CASCADE)
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='genres')
 
     def __str__(self):
         return f'{self.title}, жанр - {self.genre}'

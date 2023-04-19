@@ -2,7 +2,7 @@ from rest_framework.serializers import ModelSerializer
 from rest_framework.relations import SlugRelatedField
 from rest_framework import serializers
 
-from reviews.models import Category, Comment, Genre, Title, GenreTitle, Review
+from reviews.models import Category, Comment, Genre, Title, Review
 from reviews.models import User
 from api_yamdb.validators import validate_username
 
@@ -29,18 +29,19 @@ class TokenSerializer(serializers.ModelSerializer):
 
 class CategorySerializer(ModelSerializer):
     class Meta:
-        fields = '__all__'
+        fields = ('name', 'slug')
         model = Category
 
 
 class GenreSerializer(ModelSerializer):
     class Meta:
-        fields = '__all__'
+        fields = ('name', 'slug')
         model = Genre
 
 
 class TitleSerializer(ModelSerializer):
     genre = SlugRelatedField(
+        many=True,
         slug_field='slug',
         queryset=Genre.objects.all()
     )
@@ -52,6 +53,16 @@ class TitleSerializer(ModelSerializer):
     class Meta:
         fields = '__all__'
         model = Title
+
+
+class GenreTitleSerializer(ModelSerializer):
+    genre = GenreSerializer(many=True, read_only=True)
+    category = CategorySerializer(read_only=True)
+    rating = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = Title
+        fields = '__all__'
 
 
 class ReviewSerializer(ModelSerializer):

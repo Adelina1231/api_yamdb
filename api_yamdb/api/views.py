@@ -26,9 +26,11 @@ from .serializers import (
     ReviewSerializer,
     SignupSerializer,
     TitleSerializer,
+    GenreTitleSerializer,
     TokenSerializer
 )
-from .permissions import AdminOnly, OnlyRegistered
+from .permissions import AdminOnly, OnlyRegistered, AdminOrReadOnly
+from .filters import TitleFilter
 
 
 @api_view(["POST"])
@@ -83,21 +85,32 @@ class CreateListDestroyViewSet(
 class CategoryViewSet(CreateListDestroyViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    filter_backends = filters.SearchFilter
-    search_fields = "name"
+    filter_backends = (filters.SearchFilter,)
+    permission_classes = (AdminOrReadOnly,)
+    search_fields = ("name",)
+    lookup_field = 'slug'
 
 
 class GenreViewSet(CreateListDestroyViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    filter_backends = filters.SearchFilter
-    search_fields = "name"
+    filter_backends = (filters.SearchFilter,)
+    permission_classes = (AdminOrReadOnly,)
+    search_fields = ("name",)
+    lookup_field = 'slug'
 
 
 class TitleViewSet(ModelViewSet):
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
     filter_backends = (DjangoFilterBackend,)
+    permission_classes = (AdminOrReadOnly,)
+    filterset_class = TitleFilter
+
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return GenreTitleSerializer
+        return TitleSerializer
 
 
 class UsersViewSet(ModelViewSet):
