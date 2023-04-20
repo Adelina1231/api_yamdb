@@ -1,17 +1,6 @@
 from django.contrib import admin
 
-from .models import User, Category, Genre, Title, GenreTitle, Review, Comment
-
-class UserAdmin(admin.ModelAdmin):
-    list_display = (
-        'pk',
-        'username',
-        'email',
-        'role',
-        'bio'
-    )
-    search_fields = ('username',)
-    empty_value_display = '-пусто-'
+from .models import Category, Genre, Title, GenreTitle, Review, Comment
 
 
 class CategoryAdmin(admin.ModelAdmin):
@@ -22,6 +11,7 @@ class CategoryAdmin(admin.ModelAdmin):
     )
     search_fields = ('name',)
     list_filter = ('name',)
+    prepopulated_fields = {'slug': ('name',)}
     empty_value_display = '-пусто-'
 
 
@@ -33,6 +23,7 @@ class GenreAdmin(admin.ModelAdmin):
     )
     search_fields = ('name',)
     list_filter = ('name',)
+    prepopulated_fields = {'slug': ('name',)}
     empty_value_display = '-пусто-'
 
 
@@ -42,7 +33,7 @@ class TitleAdmin(admin.ModelAdmin):
         'name',
         'year',
         'description',
-        'category'
+        'category',
     )
     search_fields = ('name', 'year', 'category')
     list_filter = ('name',)
@@ -52,8 +43,8 @@ class TitleAdmin(admin.ModelAdmin):
 class GenreTitleAdmin(admin.ModelAdmin):
     list_display = (
         'pk',
-        'title',
-        'genre',
+        'title_id',
+        'genre_id',
     )
     search_fields = ('title',)
     empty_value_display = '-пусто-'
@@ -83,7 +74,6 @@ class CommentAdmin(admin.ModelAdmin):
     empty_value_display = '-пусто-'
 
 
-admin.site.register(User, UserAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Genre, GenreAdmin)
 admin.site.register(Title, TitleAdmin)
