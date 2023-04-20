@@ -21,6 +21,7 @@ class Test05ReviewAPI:
         new_data = {'text': 'new_text', 'score': 7}
 
         response = client.get(f'/api/v1/titles/{titles[0]["id"]}/reviews/')
+
         assert response.status_code != HTTPStatus.NOT_FOUND, (
             'Эндпоинт `/api/v1/titles/{title_id}/reviews/` не найден, '
             'проверьте настройки в *urls.py*.'

@@ -2,9 +2,20 @@ import csv
 import os
 from django.apps import apps
 from django.core.management.base import BaseCommand
-
 from api_yamdb.settings import BASE_DIR
-from reviews.models import Title
+
+
+class bc:
+    HEADER = "\033[95m"
+    OKBLUE = "\033[94m"
+    OKCYAN = "\033[96m"
+    OKGREEN = "\033[92m"
+    WARNING = "\033[93m"
+    FAIL = "\033[91m"
+    ENDC = "\033[0m"
+    BOLD = "\033[1m"
+    UNDERLINE = "\033[4m"
+
 
 # Словарь импорта
 # [key: имя модели в БД]: {
@@ -54,6 +65,15 @@ IMPORT_DICTIONARY = {
             "category": "Category.id",
         },
     },
+    "GenreTitle": {
+        "fileName": "genre_title.csv",
+        "modelPath": "reviews.GenreTitle",
+        "fieldsMatch": {
+            "id": "id",
+            "title_id": "Title.id",
+            "genre_id": "Genre.id",
+        },
+    },
     "Review": {
         "fileName": "review.csv",
         "modelPath": "reviews.Review",
@@ -86,7 +106,7 @@ def parse_csv(reader):
     result = []
     for r in range(1, len(rows)):
         fields_dict = {}
-        for h in range(0, len(headers)):
+        for h in range(len(headers)):
             fields_dict[headers[h]] = rows[r][h]
         result.insert(r, fields_dict)
     return result
@@ -100,8 +120,12 @@ def get_full_record(record_info, fields_match):
             related_model = apps.get_model(
                 IMPORT_DICTIONARY[related_modelName]["modelPath"]
             )
-            print(record_info["id"])
-            full_record[key] = related_model.get_or_create(pk=record_info["id"])
+            related_object = related_model.objects.get(id=record_info[key])
+            if key.find("_id") != -1:
+                full_record[key] = related_object.id
+            else:
+                full_record[key] = related_object
+
         else:
             full_record[key] = record_info.get(key)
     return full_record
@@ -110,37 +134,38 @@ def get_full_record(record_info, fields_match):
 def load_data_from_csv_to_model(import_info, reader):
     fields_match = import_info["fieldsMatch"]
     model = apps.get_model(import_info["modelPath"])
+    print(
+        (
+            f"\n→ {bc.OKCYAN}Загрузка CSV для таблицы: "
+            f'{import_info["modelPath"]}...{bc.ENDC}'
+        )
+    )
     records = parse_csv(reader)
-
+    print(f"→ {bc.BOLD}Обнаружено записей: {len(records)}.{bc.ENDC}")
     for record in records:
         full_record = get_full_record(record, fields_match)
         try:
-            model.objects.create(**full_record)
+            model.objects.update_or_create(**full_record)
         except Exception as e:
-            print(f"Ошибка создания записи: {e}")
+            print(f"{bc.FAIL}Ошибка создания записи: {e}{bc.ENDC}")
             exit
+    print(
+        (
+            f'→ {bc.OKGREEN}Таблица {import_info["modelPath"]} '
+            f"успешно обновлена!{bc.ENDC}"
+        )
+    )
 
 
 class Command(BaseCommand):
     """Заполняет БД."""
 
     def handle(self, *args, **options):
-        for import_info in IMPORT_DICTIONARY.values():
+        for im_inf in IMPORT_DICTIONARY.values():
             with open(
-                os.path.join(BASE_DIR, "static/data/" + import_info["fileName"]),
+                os.path.join(BASE_DIR, f'static/data/{im_inf["fileName"]}'),
                 "r",
                 encoding="utf-8",
             ) as csv_file:
                 reader = csv.reader(csv_file, delimiter=",")
-                load_data_from_csv_to_model(import_info, reader)
-
-        #     try:
-        #         # ссылка на модель
-        #         model_link = MODEL_LINKS[model]
-        #         model_link.objects.create(**object_fields)
-        #         obj_count += 1
-        #     except Exception as e:
-        #         print(f'Ошибка создания записи: {e}')
-        #         exit
-
-        # for file in files:
+                load_data_from_csv_to_model(im_inf, reader)
