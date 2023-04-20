@@ -10,7 +10,9 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from rest_framework import filters
-from rest_framework.mixins import CreateModelMixin, ListModelMixin, DestroyModelMixin
+from rest_framework.mixins import (CreateModelMixin,
+                                   ListModelMixin,
+                                   DestroyModelMixin)
 
 from users.models import User
 from reviews.models import Category, Comment, Genre, Review, Title
@@ -42,25 +44,13 @@ def signup(request):
     username = request.data.get("username", None)
     email = request.data.get("email", None)
 
-    if not serializer.is_valid(raise_exception=True):
-        return Response(status=status.HTTP_400_BAD_REQUEST)
-
-    if username is None or email is None:
-        return Response(status=status.HTTP_400_BAD_REQUEST)
-
-    if check_email_exist(email):
-        user = User.objects.filter(email=email).first()
-        if user.username != username:
+    serializer.is_valid(raise_exception=True)
+    if not User.objects.filter(username=username, email=email).exists():
+        if check_email_exist(email) or check_username_exist(username):
             return Response(status=status.HTTP_400_BAD_REQUEST)
-    elif check_username_exist(username):
-        user = User.objects.filter(username=username).first()
-        if user.email != email:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-    else:
         serializer.save()
+    user = User.objects.filter(email=email).first()
 
-    user = User.objects.get(email=email, username=username)
-    print(user)
     confirmation_code = default_token_generator.make_token(user)
     send_mail(
         "Hello! Your confirmation code: ",
