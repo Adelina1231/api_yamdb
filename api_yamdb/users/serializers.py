@@ -1,12 +1,12 @@
 from rest_framework import serializers
 
 from .models import User
-from api_yamdb.validators import validate_username
+from api_yamdb.validators import validate_username, validate_email
 
 
 class UserSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(
-        max_length=254, allow_blank=False)
+        max_length=254, allow_blank=False, validators=[validate_email])
     username = serializers.CharField(
         max_length=150, allow_blank=False, validators=[validate_username]
     )

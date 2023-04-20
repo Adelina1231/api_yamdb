@@ -1,11 +1,23 @@
+import re
+
 from django.core.validators import RegexValidator
 from django.utils import timezone
 from rest_framework.exceptions import ValidationError
 
+from users.models import User
+
 
 def validate_username(value):
-    if value == 'me':
-        raise ValidationError('Недопустимое имя пользователя!')
+    error_message = 'Недопустимое имя пользователя!'
+    reg = re.compile(r'^[\w.@+-]+$')
+    if value == 'me' or not reg.match(value):
+        raise ValidationError(error_message)
+
+
+def validate_email(value):
+    if User.objects.filter(email=value).exists():
+        raise ValidationError('Пользователь с такой почтой '
+                              'уже зарегестрирован')
 
 
 def validate_year(value):
