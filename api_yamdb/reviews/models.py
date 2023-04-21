@@ -2,56 +2,56 @@ from django.db import models
 from django.db.models import Avg
 
 from api_yamdb.validators import validate_year, validate_slug
-from api_yamdb.settings import LEN_TEXT
+from api_yamdb.settings import LEN_TEXT, LEN_NAME, LEN_SLUG
 from users.models import User
 
 
 class Category(models.Model):
     name = models.CharField(
         'Название',
-        max_length=256
+        max_length=LEN_NAME
     )
     slug = models.SlugField(
         'Адрес',
-        max_length=50,
+        max_length=LEN_SLUG,
         validators=(validate_slug,),
         unique=True
     )
-
-    def __str__(self):
-        return self.name[:LEN_TEXT]
 
     class Meta:
         verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
         ordering = ('name',)
 
+    def __str__(self):
+        return self.name[:LEN_TEXT]
+
 
 class Genre(models.Model):
     name = models.CharField(
         'Название',
-        max_length=256
+        max_length=LEN_NAME
     )
     slug = models.SlugField(
         'Адрес',
-        max_length=50,
+        max_length=LEN_SLUG,
         validators=(validate_slug,),
         unique=True
     )
-
-    def __str__(self):
-        return self.name[:LEN_TEXT]
 
     class Meta:
         verbose_name = 'Жанр'
         verbose_name_plural = 'Жанры'
         ordering = ('name',)
 
+    def __str__(self):
+        return self.name[:LEN_TEXT]
+
 
 class Title(models.Model):
     name = models.CharField(
         'Название',
-        max_length=256
+        max_length=LEN_NAME
     )
     year = models.IntegerField(
         'Год выпуска',
@@ -76,9 +76,6 @@ class Title(models.Model):
         null=True
     )
 
-    def __str__(self):
-        return self.name[:LEN_TEXT]
-
     @property
     def rating(self):
         """
@@ -94,7 +91,10 @@ class Title(models.Model):
     class Meta:
         verbose_name = 'Произведение'
         verbose_name_plural = 'Произведения'
-        ordering = ('name',)
+        ordering = ('-year', 'name')
+
+    def __str__(self):
+        return self.name[:LEN_TEXT]
 
 
 class GenreTitle(models.Model):
@@ -113,12 +113,13 @@ class GenreTitle(models.Model):
         blank=True,
         related_name='genres')
 
-    def __str__(self):
-        return f'{self.title}, жанр - {self.genre}'
-
     class Meta:
         verbose_name = 'Произведение и жанр'
         verbose_name_plural = 'Произведения и жанры'
+        ordering = ('id',)
+
+    def __str__(self):
+        return f'{self.title}, жанр - {self.genre}'
 
 
 class Review(models.Model):
@@ -147,9 +148,6 @@ class Review(models.Model):
         verbose_name='Произведение',
     )
 
-    def __str__(self):
-        return self.title.name
-
     class Meta:
         verbose_name = 'Отзыв'
         verbose_name_plural = 'Отзывы'
@@ -159,6 +157,9 @@ class Review(models.Model):
             ),
         )
         ordering = ('pub_date',)
+
+    def __str__(self):
+        return self.title.name[:LEN_TEXT]
 
 
 class Comment(models.Model):
