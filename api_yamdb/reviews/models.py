@@ -1,5 +1,4 @@
 from django.db import models
-from django.db.models import Avg
 
 from api_yamdb.validators import validate_year, validate_slug
 from api_yamdb.settings import LEN_TEXT, LEN_NAME, LEN_SLUG
@@ -53,8 +52,9 @@ class Title(models.Model):
         'Название',
         max_length=LEN_NAME
     )
-    year = models.IntegerField(
+    year = models.PositiveIntegerField(
         'Год выпуска',
+        db_index=True,
         validators=[validate_year]
     )
     description = models.TextField(
@@ -75,18 +75,6 @@ class Title(models.Model):
         related_name='titles',
         null=True
     )
-
-    @property
-    def rating(self):
-        """
-        Свойство, возвращающее средний рейтинг произведения, рассчитанный
-        на основе всех отзывов.
-        """
-        reviews = self.reviews.all()
-        if reviews:
-            return reviews.aggregate(Avg('score'))['score__avg']
-        else:
-            return None
 
     class Meta:
         verbose_name = 'Произведение'

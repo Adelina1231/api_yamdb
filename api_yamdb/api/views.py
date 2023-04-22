@@ -1,5 +1,6 @@
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
+from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django.conf import settings
 from django_filters.rest_framework import DjangoFilterBackend
@@ -15,7 +16,7 @@ from rest_framework.mixins import (CreateModelMixin,
                                    DestroyModelMixin)
 
 from users.models import User
-from reviews.models import Category, Comment, Genre, Review, Title
+from reviews.models import Category, Genre, Review, Title
 from users.serializers import UserSerializer
 from .serializers import (
     CategorySerializer,
@@ -103,7 +104,7 @@ class GenreViewSet(CreateListDestroyViewSet):
 
 
 class TitleViewSet(ModelViewSet):
-    queryset = Title.objects.all()
+    queryset = Title.objects.annotate(rating=Avg('reviews__score')).all()
     serializer_class = TitleSerializer
     filter_backends = (DjangoFilterBackend,)
     permission_classes = (AdminOrReadOnly,)
@@ -175,7 +176,11 @@ class CommentViewSet(ModelViewSet):
     search_fields = ("review", "author")
 
     def get_queryset(self):
-        review = get_object_or_404(Review, pk=self.kwargs.get("review_id"))
+        review = get_object_or_404(
+            Review,
+            id=self.kwargs.get("review_id"),
+            title__id=self.kwargs.get("title_id")
+        )
         return review.comments.all()
 
     def perform_create(self, serializer):
