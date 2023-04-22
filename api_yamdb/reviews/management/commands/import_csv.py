@@ -104,11 +104,13 @@ def parse_csv(reader):
     rows = list(reader)
     headers = rows[0]
     result = []
-    for r in range(1, len(rows)):
+
+    for row in rows[1:]:
         fields_dict = {}
-        for h in range(len(headers)):
-            fields_dict[headers[h]] = rows[r][h]
-        result.insert(r, fields_dict)
+        for i, header in enumerate(headers):
+            fields_dict[header] = row[i]
+        result.append(fields_dict)
+
     return result
 
 

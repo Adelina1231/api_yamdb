@@ -1,18 +1,18 @@
 from django.db import models
+from django.conf import settings
 
 from api_yamdb.validators import validate_year, validate_slug
-from api_yamdb.settings import LEN_TEXT, LEN_NAME, LEN_SLUG
 from users.models import User
 
 
 class Category(models.Model):
     name = models.CharField(
         'Название',
-        max_length=LEN_NAME
+        max_length=settings.LEN_NAME
     )
     slug = models.SlugField(
         'Адрес',
-        max_length=LEN_SLUG,
+        max_length=settings.LEN_SLUG,
         validators=(validate_slug,),
         unique=True
     )
@@ -23,17 +23,17 @@ class Category(models.Model):
         ordering = ('name',)
 
     def __str__(self):
-        return self.name[:LEN_TEXT]
+        return self.name[:settings.LEN_TEXT]
 
 
 class Genre(models.Model):
     name = models.CharField(
         'Название',
-        max_length=LEN_NAME
+        max_length=settings.LEN_NAME
     )
     slug = models.SlugField(
         'Адрес',
-        max_length=LEN_SLUG,
+        max_length=settings.LEN_SLUG,
         validators=(validate_slug,),
         unique=True
     )
@@ -44,13 +44,13 @@ class Genre(models.Model):
         ordering = ('name',)
 
     def __str__(self):
-        return self.name[:LEN_TEXT]
+        return self.name[:settings.LEN_TEXT]
 
 
 class Title(models.Model):
     name = models.CharField(
         'Название',
-        max_length=LEN_NAME
+        max_length=settings.LEN_NAME
     )
     year = models.PositiveIntegerField(
         'Год выпуска',
@@ -82,7 +82,7 @@ class Title(models.Model):
         ordering = ('-year', 'name')
 
     def __str__(self):
-        return self.name[:LEN_TEXT]
+        return self.name[:settings.LEN_TEXT]
 
 
 class GenreTitle(models.Model):
@@ -116,7 +116,7 @@ class Review(models.Model):
     )
     score = models.IntegerField(
         'Оценка',
-        choices=[(i, i) for i in range(1, 11)]
+        choices=[(i, i) for i in range(1, settings.LEN_RATING + 1)]
     )
     pub_date = models.DateTimeField(
         auto_now_add=True,
@@ -147,7 +147,7 @@ class Review(models.Model):
         ordering = ('pub_date',)
 
     def __str__(self):
-        return self.title.name[:LEN_TEXT]
+        return self.title.name[:settings.LEN_TEXT]
 
 
 class Comment(models.Model):

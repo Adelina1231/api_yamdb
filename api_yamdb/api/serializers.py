@@ -1,18 +1,19 @@
 from django.shortcuts import get_object_or_404
+from django.conf import settings
 
 from rest_framework import serializers
-from rest_framework.exceptions import ParseError
+from rest_framework.exceptions import ValidationError
 from rest_framework.relations import SlugRelatedField
 from rest_framework.serializers import ModelSerializer
 
 from api_yamdb.validators import validate_username
-from api_yamdb.settings import LEN_EMAIL, LEN_USERNAME, LEN_TOKEN
 from reviews.models import Category, Comment, Genre, Review, Title, User
 
 
 class SignupSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(max_length=LEN_EMAIL, allow_blank=False)
-    username = serializers.CharField(max_length=LEN_USERNAME,
+    email = serializers.EmailField(max_length=settings.LEN_EMAIL,
+                                   allow_blank=False)
+    username = serializers.CharField(max_length=settings.LEN_USERNAME,
                                      allow_blank=False,
                                      validators=[validate_username])
 
@@ -23,7 +24,7 @@ class SignupSerializer(serializers.ModelSerializer):
 
 class TokenSerializer(serializers.ModelSerializer):
     confirmation_code = serializers.CharField(allow_blank=False)
-    username = serializers.CharField(max_length=LEN_TOKEN,
+    username = serializers.CharField(max_length=settings.LEN_TOKEN,
                                      allow_blank=False,
                                      validators=[validate_username])
 
@@ -92,7 +93,7 @@ class ReviewSerializer(serializers.ModelSerializer):
             self.context['request'].method == 'POST'
             and Review.objects.filter(author=user, title=title).exists()
         ):
-            raise ParseError(
+            raise ValidationError(
                 'Возможен только один отзыв на произведение!'
             )
         return data

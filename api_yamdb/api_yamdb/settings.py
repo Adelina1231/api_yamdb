@@ -113,10 +113,13 @@ EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 EMAIL_FILE_PATH = Path.cwd() / 'sent_emails'
 EMAIL_AUTH_ADDR = 'info@yamdb.ru'
 
+LEN_RATING = 10
 LEN_TEXT = 15
 LEN_SLUG = 50
+LEN_ROLE = 50
 LEN_USERNAME = 150
 LEN_TOKEN = 150
+LEN_BIO = 200
 LEN_EMAIL = 254
 LEN_NAME = 256
 

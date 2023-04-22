@@ -1,4 +1,5 @@
 from django.contrib.auth.models import AbstractUser
+from django.conf import settings
 from django.db import models
 
 
@@ -8,8 +9,10 @@ class User(AbstractUser):
     MODERATOR = "moderator"
     ROLES = ((USER, "user"), (MODERATOR, "moderator"), (ADMIN, "admin"))
 
-    role = models.CharField("Роль", max_length=50, choices=ROLES, default=USER)
-    bio = models.TextField("Биография", max_length=200, blank=True)
+    role = models.CharField("Роль", max_length=settings.LEN_ROLE,
+                            choices=ROLES, default=USER)
+    bio = models.TextField("Биография", max_length=settings.LEN_BIO,
+                           blank=True)
 
     @property
     def is_admin(self):
