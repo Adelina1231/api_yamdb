@@ -136,14 +136,9 @@ class UsersViewSet(ModelViewSet):
             serializer = self.get_serializer(user)
             return Response(serializer.data, status=status.HTTP_200_OK)
         serializer = self.get_serializer(user, data=request.data, partial=True)
-        if serializer.is_valid():
-            if "role" in request.data:
-                if user.role != User.USER:
-                    serializer.save()
-            else:
-                serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(role=user.role)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class ReviewViewSet(ModelViewSet):

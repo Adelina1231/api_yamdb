@@ -5,7 +5,7 @@ from django.core.management.base import BaseCommand
 from api_yamdb.settings import BASE_DIR
 
 
-class bc:
+class Bcolors:
     HEADER = "\033[95m"
     OKBLUE = "\033[94m"
     OKCYAN = "\033[96m"
@@ -138,23 +138,23 @@ def load_data_from_csv_to_model(import_info, reader):
     model = apps.get_model(import_info["modelPath"])
     print(
         (
-            f"\n→ {bc.OKCYAN}Загрузка CSV для таблицы: "
-            f'{import_info["modelPath"]}...{bc.ENDC}'
+            f"\n→ {Bcolors.OKCYAN}Загрузка CSV для таблицы: "
+            f'{import_info["modelPath"]}...{Bcolors.ENDC}'
         )
     )
     records = parse_csv(reader)
-    print(f"→ {bc.BOLD}Обнаружено записей: {len(records)}.{bc.ENDC}")
+    print(f"→ {Bcolors.BOLD}Обнаружено записей: {len(records)}.{Bcolors.ENDC}")
     for record in records:
         full_record = get_full_record(record, fields_match)
         try:
             model.objects.update_or_create(**full_record)
         except Exception as e:
-            print(f"{bc.FAIL}Ошибка создания записи: {e}{bc.ENDC}")
+            print(f"{Bcolors.FAIL}Ошибка создания записи: {e}{Bcolors.ENDC}")
             exit
     print(
         (
-            f'→ {bc.OKGREEN}Таблица {import_info["modelPath"]} '
-            f"успешно обновлена!{bc.ENDC}"
+            f'→ {Bcolors.OKGREEN}Таблица {import_info["modelPath"]} '
+            f"успешно обновлена!{Bcolors.ENDC}"
         )
     )
 
