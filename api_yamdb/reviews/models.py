@@ -123,7 +123,7 @@ class Review(models.Model):
         db_index=True,
         verbose_name='Дата публикации',
     )
-    author = author = models.ForeignKey(
+    author = models.ForeignKey(
         User,
         on_delete=models.CASCADE, null=True,
         related_name='reviews',

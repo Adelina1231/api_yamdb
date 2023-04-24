@@ -76,27 +76,33 @@ class ReviewSerializer(serializers.ModelSerializer):
         slug_field='username', read_only=True
     )
     title = serializers.SlugRelatedField(
-        slug_field='name', read_only=True
+        slug_field='name', read_only=True,
     )
 
     class Meta:
         fields = '__all__'
         model = Review
 
-    def validate(self, data):
+    def validate(self, attrs):
         title_id = (
             self.context['request'].parser_context['kwargs']['title_id']
         )
         title = get_object_or_404(Title, pk=title_id)
+        self.validate_title(title)
+        return super().validate(attrs)
+
+    # не будет вызываться автоматически, так как tilte не обозначено,
+    # как required, а read_only и required вместе не возможны у одного поля
+    def validate_title(self, value):
         user = self.context['request'].user
         if (
             self.context['request'].method == 'POST'
-            and Review.objects.filter(author=user, title=title).exists()
+            and Review.objects.filter(author=user, title=value).exists()
         ):
             raise ValidationError(
                 'Возможен только один отзыв на произведение!'
             )
-        return data
+        return value
 
 
 class CommentSerializer(serializers.ModelSerializer):
